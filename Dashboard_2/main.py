@@ -4,11 +4,10 @@ import dash
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import hashlib as hl
-from load import columngrouper
 pd.options.plotting.backend = "plotly"
 
 """Data"""
-athletes = pd.read_csv("athlete_events.csv")
+athletes = pd.read_csv("Data/athlete_events.csv")
 hashed_names = athletes["Name"].apply(lambda x: hl.sha256(x.encode()).hexdigest())
 athletes.insert(1,"Hashed name", hashed_names)
 athletes = athletes.drop(columns="Name")
@@ -18,8 +17,10 @@ italy_df = italy_df[italy_df["Team"]=="Italy"]
 italy_most_medals = italy_df.groupby("Sport").count().reset_index()
 italy_most_medals = italy_most_medals.sort_values(by="Medal",ascending=False)
 
+italy_city = italy_df.groupby("City").count().reset_index()
+italy_city = italy_city.sort_values(by="Medal", ascending = False)
 
-fig = make_subplots(1,2)
+fig = make_subplots(1,3)
 fig.add_trace(
     go.Bar(
         x=italy_most_medals["Sport"], 
@@ -34,9 +35,9 @@ fig.add_trace(
 
 fig.add_trace(
     go.Bar(
-        x=italy_df
-    )
-)
+        x=italy_city['City'],
+        y=italy_city['Medal']),
+        row=1,col=3)
 
 dropdown_dict = dict(Sport="Medal", )
 
