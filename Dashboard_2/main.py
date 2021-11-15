@@ -46,12 +46,12 @@ def update_graph(selected_option):
     if selected_option == 'Age' or selected_option == 'Height' or selected_option == 'Weight':
         fig = px.scatter(filtered_italy, x=selected_option ,
                         y = 'Medal', color='Medal', 
-                        title=f'Gold Medals in{selected_option}')
+                        title=f'Gold Medals in {selected_option}')
 
     elif selected_option == 'Sex' or selected_option == 'Season':
-        fig = px.pie(filtered_italy, x=selected_option ,
-                        y = 'Medal', color='Medal', 
-                        title=f'Gold Medals in{selected_option}')
+        fig = px.pie(filtered_italy, selected_option ,
+                        'Medal', color='Medal', 
+                        title=f'Gold Medals divided by {selected_option}')
     
     elif selected_option == 'Medal':
       """  fig = px.bar(filtered_italy,
