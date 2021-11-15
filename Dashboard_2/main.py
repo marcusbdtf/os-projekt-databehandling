@@ -42,9 +42,27 @@ app.layout = html.Div(children=[
 
 def update_graph(selected_option):
     filtered_italy = process_data(italy_df, selected_option)
-    fig = px.bar(filtered_italy,
+
+    if selected_option == 'Age' or selected_option == 'Height' or selected_option == 'Weight':
+        fig = px.scatter(filtered_italy, x=selected_option ,
+                        y = 'Medal', color='Medal', 
+                        title=f'Gold Medals in{selected_option}')
+
+    elif selected_option == 'Sex' or selected_option == 'Season':
+        fig = px.pie(filtered_italy, x=selected_option ,
+                        y = 'Medal', color='Medal', 
+                        title=f'Gold Medals in{selected_option}')
+    
+    elif selected_option == 'Medal':
+      """  fig = px.bar(filtered_italy,
+                    x = selected_option, y = selected_option,
+                    color= selected_option,
+                    title=f'Gold Medals in {selected_option}')"""
+        
+    else:     
+        fig = px.bar(filtered_italy,
                     x = selected_option, y = 'Medal',
-                    color='Sport',
+                    color= selected_option,
                     title=f'Gold Medals in {selected_option}')
     return fig
 
