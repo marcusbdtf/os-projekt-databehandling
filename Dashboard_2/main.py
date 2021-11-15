@@ -54,10 +54,10 @@ def update_graph(selected_option):
                         title=f'Gold Medals divided by {selected_option}')
     
     elif selected_option == 'Medal':
-      """  fig = px.bar(filtered_italy,
-                    x = selected_option, y = selected_option,
+        fig = px.bar(process_data(italy_df, "Medal").sort_values(by="ID", ascending=False),
+                    x = selected_option, y = "ID",
                     color= selected_option,
-                    title=f'Gold Medals in {selected_option}')"""
+                    title=f'Gold Medals in {selected_option}')
         
     else:     
         fig = px.bar(filtered_italy,
