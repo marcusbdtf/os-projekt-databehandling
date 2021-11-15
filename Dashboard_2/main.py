@@ -15,7 +15,7 @@ athletes.insert(1,"Hashed name", hashed_names)
 athletes = athletes.drop(columns="Name")
 
 italy_df = athletes.drop_duplicates(subset=["Medal", "Games","Event"])
-italy_df = italy_df[italy_df["Team"]=="Italy"]
+italy_df = italy_df[italy_df["NOC"]=="ITA"]
 italy_most_medals = italy_df.groupby("Sport").count().reset_index()
 italy_most_medals = italy_most_medals.sort_values(by="Medal",ascending=False)
 
