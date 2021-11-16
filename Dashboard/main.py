@@ -4,7 +4,8 @@ import dash
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import hashlib as hl
-
+import plotly_express as px
+from dash.dependencies import Input, Output
 pd.options.plotting.backend = "plotly"
 
 """Data"""
@@ -14,32 +15,59 @@ athletes.insert(1,"Hashed name", hashed_names)
 athletes = athletes.drop(columns="Name")
 
 italy_df = athletes.drop_duplicates(subset=["Medal", "Games","Event"])
-italy_df = italy_df[italy_df["Team"]=="Italy"]
+italy_df = italy_df[italy_df["NOC"]=="ITA"]
 italy_most_medals = italy_df.groupby("Sport").count().reset_index()
 italy_most_medals = italy_most_medals.sort_values(by="Medal",ascending=False)
 
+def process_data(old_df, col):
+    filtered_df = old_df.groupby(col).count().reset_index()
+    filtered_df.rename(columns={"ID":"Total"}, inplace=True)
+    filtered_df = filtered_df.sort_values(by="Total", ascending=False)
+    filtered_df = filtered_df[filtered_df.columns[0:2]]
+    return filtered_df 
 
-fig = make_subplots(1,2)
-fig.add_trace(
-    go.Bar(
-        x=italy_most_medals["Sport"], 
-        y=italy_most_medals["Medal"]
-        )
-    )
-fig.add_trace(
-    go.Bar(
-        x=italy_most_medals[0:10]["Sport"], 
-        y=italy_most_medals[0:10]["Medal"]),
-    row=1,col=2)
+app = dash.Dash()
 
-
-app = dash.Dash(__name__)
-
-app.layout = html.Div([
-    html.H1("Olympics Data"),
-    
-    dcc.Graph(id='os-graph', figure=fig),
+app.layout = html.Div(children=[
+    html.H1(children='Italy Olympics Graphs'),
+    dcc.Dropdown(id='olympics-dropdown',
+                    options=[{'label': i, 'value': i}
+                    for i in italy_df],
+                    value='Sport'),
+    dcc.Graph(id='medals-graph')
 ])
+
+@app.callback(
+    Output(component_id='medals-graph', component_property='figure'),
+    Input(component_id='olympics-dropdown', component_property='value')
+)
+
+def update_graph(selected_option):
+    filtered_italy = process_data(italy_df, selected_option)
+
+    if selected_option == 'Age' or selected_option == 'Height' or selected_option == 'Weight':
+        fig = px.scatter(filtered_italy, x=selected_option ,
+                        y = 'Total', color='Total', 
+                        title=f'Total number of medals / {selected_option}')
+
+    elif selected_option == 'Sex' or selected_option == 'Season':
+        fig = px.pie(filtered_italy, selected_option ,
+                        'Total', color='Total', 
+                        title=f'Total number of medals per /  {selected_option}')
+    
+    elif selected_option == 'Medal':
+        fig = px.bar(process_data(italy_df, selected_option),
+                    x = selected_option, y = "Total",
+                    color = selected_option,
+                    title=f'Total number of medals')
+        
+    else:     
+        fig = px.bar(filtered_italy,
+                    x = selected_option, y = 'Total',
+                    color= selected_option,
+                    title=f'Total number of medals / {selected_option}')
+    return fig
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
