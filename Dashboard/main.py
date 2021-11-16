@@ -1,38 +1,19 @@
 import pandas as pd
 from dash import dcc, html
 import dash
-from plotly.subplots import make_subplots
-import plotly.graph_objects as go
-import hashlib as hl
 import plotly_express as px
 from dash.dependencies import Input, Output
-pd.options.plotting.backend = "plotly"
+from process_data import get_italy_data
+from process_data import process_data
 
-"""Data"""
-athletes = pd.read_csv("Data/athlete_events.csv")
-hashed_names = athletes["Name"].apply(lambda x: hl.sha256(x.encode()).hexdigest())
-athletes.insert(1,"Hashed name", hashed_names)
-athletes = athletes.drop(columns="Name")
-
-italy_df = athletes.drop_duplicates(subset=["Medal", "Games","Event"])
-italy_df = italy_df[italy_df["NOC"]=="ITA"]
-italy_most_medals = italy_df.groupby("Sport").count().reset_index()
-italy_most_medals = italy_most_medals.sort_values(by="Medal",ascending=False)
-
-def process_data(old_df, col):
-    filtered_df = old_df.groupby(col).count().reset_index()
-    filtered_df.rename(columns={"ID":"Total"}, inplace=True)
-    filtered_df = filtered_df.sort_values(by="Total", ascending=False)
-    filtered_df = filtered_df[filtered_df.columns[0:2]]
-    return filtered_df 
-
+italy_df = get_italy_data()
 app = dash.Dash()
 
 app.layout = html.Div(children=[
     html.H1(children='Italy Olympics Graphs'),
     dcc.Dropdown(id='olympics-dropdown',
                     options=[{'label': i, 'value': i}
-                    for i in italy_df],
+                    for i in italy_df.iloc[:,0:-1]], # excluding last column "Total", it's a useless graph
                     value='Sport'),
     dcc.Graph(id='medals-graph')
 ])
