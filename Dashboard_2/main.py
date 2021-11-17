@@ -89,21 +89,16 @@ app.layout = html.Div([
 @app.callback(
     Output("page-content", "children"),
     [Input("url", "pathname")],
-    Input(component_id='olympics-dropdown', component_property='value')
-    
-    
-)
-def page_loader(pathname, selected_option):
-    if pathname == "/":
-        return update_graph(selected_option)
+    Input(component_id='olympics-dropdown', component_property='value'))
 
-    elif pathname == "page-2":
-        pass
+
+
 
 @app.callback(
     Output(component_id='medals-graph', component_property='figure'),
-    Input(component_id='olympics-dropdown', component_property='value'),
-)
+    Input(component_id='olympics-dropdown', component_property='value'),)
+        #Links update graph with dropdown
+        
 def update_graph(selected_option):
     filtered_italy = process_data(italy_df, selected_option)
 
@@ -129,6 +124,29 @@ def update_graph(selected_option):
                     color= selected_option,
                     title=f'Gold Medals in {selected_option}')
     return fig
+
+fig = make_subplots(2,2)
+fig.add_trace(
+    go.Bar(
+        x=italy_most_medals["Sport"], 
+        y=italy_most_medals["Medal"]
+        )
+    )
+fig.add_trace(
+    go.Bar(
+        x=italy_most_medals[0:10]["Sport"], 
+        y=italy_most_medals[0:10]["Medal"]),
+    row=1,col=2)
+fig.add_trace(
+    go.Bar(
+        x=italy_most_medals[0:10]["Sport"], 
+        y=italy_most_medals[0:10]["Medal"]),
+    row=2,col=1)
+fig.add_trace(
+    go.Bar(
+        x=italy_most_medals[0:10]["Sport"], 
+        y=italy_most_medals[0:10]["Medal"]),
+    row=2,col=2)
 
 
 if __name__ == '__main__':
