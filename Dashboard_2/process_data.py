@@ -12,6 +12,8 @@ athletes.drop(axis=1, columns=["ID", "Hashed name", "Team"], inplace=True)
 all_countries_df = athletes.reset_index()
 italy_df = athletes[athletes["NOC"]=="ITA"].drop(axis=1, columns="NOC").reset_index()
 
+
+
 def get_italy_data():
     return italy_df
 
@@ -24,3 +26,10 @@ def process_data(old_df, col):
     filtered_df = filtered_df[filtered_df[col].notna()]
     filtered_df = filtered_df[[col, "Total"]]
     return filtered_df
+
+def process_countries(old_df, col):
+    filtered_df = old_df.groupby(col).count().reset_index()
+    filtered_df = filtered_df.sort_values(by="Total", ascending=False)
+    filtered_df = filtered_df[0:10][filtered_df["Sport"].str.contains(["Football", "Basketball", "Handball", "Judo"])]
+    filtered_df = filtered_df[filtered_df[col].notna()]
+    filtered_df = filtered_df[[col, "Total"]]
