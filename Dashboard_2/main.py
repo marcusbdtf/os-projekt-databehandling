@@ -80,15 +80,19 @@ app.layout = html.Div([
               ),
 ], style={'margin': 'auto', 'width': "50%"},)
 
+
+"""
+Setting up callbacks for our update graph function where we want to return a figure to dcc.Graph, depending on
+#which sidebar tab is selected and what value in the dcc.Dropdown is selected.
+# """
 @app.callback(
     Output(component_id='medals-graph', component_property='figure'),
     [Input("url", "pathname")],
     Input(component_id='olympics-dropdown', component_property='value'),)
-#Setting up callbacks for our update graph function where we want to return a figure to dcc.Graph, depending on
-#which sidebar tab is selected and what value in the dcc.Dropdown is selected. 
 
 def update_graph(pathname, selected_option):
-    """Function used to update graph depending on selected dropdown catergory
+    """
+    Function used to update graph depending on selected dropdown catergory
         Returns figure into "medals-graph - figure"
     """
     fig=0
