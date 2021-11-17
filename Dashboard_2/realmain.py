@@ -21,6 +21,7 @@ sports_df = get_all_sports()
 """using our premade functions to get desired dataframes"""
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = app.server
 
 
 content_layout = {
