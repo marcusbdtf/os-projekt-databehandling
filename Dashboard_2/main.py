@@ -43,7 +43,7 @@ sidebar_layout = {
 sidebar = html.Div([
     html.Hr(),
     html.P(
-        "Historic olympic performances"
+        "Historic Olympic Performances"
     ),
     dbc.Nav([
             dbc.NavLink("Italy statistics", href="/", active="exact"),
@@ -65,7 +65,7 @@ app.layout = html.Div([
     html.H1('Various Olympic Graphs'),
     dcc.Dropdown(id='olympics-dropdown',
                     options=[{'label': i, 'value': i}
-                             for i in italy_df.columns if i != "Total"],
+                             for i in italy_df.columns[1:] if i != "Total"],
                     value='Age',
                     style={
                         "width": "50%",
@@ -137,6 +137,7 @@ def update_graph(pathname, selected_option):
             
             fig = ff.create_distplot(sportsdata, grouplabels, show_hist=False, show_rug=False)
             fig['layout'].update(title='Age distribution per sport')
+            fig.update_layout(hovermode="x")
             fig.update_xaxes(
                 showspikes = True, 
                 spikedash = "solid",
@@ -150,6 +151,7 @@ def update_graph(pathname, selected_option):
                      "Height",
                      color='Sport',
                      title=f'Height & weight between the different teams.')
+            fig.update_layout(hovermode="x")
             fig.update_xaxes(
                 showspikes = True, 
                 spikedash = "solid",
@@ -168,6 +170,7 @@ def update_graph(pathname, selected_option):
             grouplabels = ['Football', 'Basketball', 'Bobsleigh', 'Weightlifting']
             fig = ff.create_distplot(sportsdata, grouplabels, show_hist=False, show_rug=False,)
             fig['layout'].update(title='Weight distribution per sport')
+            fig.update_layout(hovermode="x")
             fig.update_xaxes(
                 showspikes = True, 
                 spikedash = "solid",
