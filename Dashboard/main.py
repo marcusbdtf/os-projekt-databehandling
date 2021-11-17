@@ -1,13 +1,17 @@
 from os import path
+from dash.development.base_component import Component
 import pandas as pd
 from dash import dcc, html
 import dash
+from plotly.subplots import make_subplots
 import plotly_express as px
 from dash.dependencies import Input, Output
+from process_data import sort_by_sports
 from process_data import get_all_countries
 from process_data import get_italy_data
 from process_data import process_data
 import dash_bootstrap_components as dbc
+import plotly.graph_objects as go
 
 italy_df = get_italy_data()
 all_countries_df = get_all_countries()
@@ -55,8 +59,7 @@ app.layout = html.Div([
     dcc.Location(id="url"),
     html.H1('Italy Olympics Graphs'),
     dcc.Dropdown(id='olympics-dropdown',
-                    options=[{'label': i, 'value': i}
-                             for i in italy_df.columns if i != "Total"],
+                    options=[{'label': i, 'value': i} for i in italy_df.columns if i != "Total"],
                     value='Sport',
                     style={
                         "width": "50%",
@@ -69,47 +72,84 @@ app.layout = html.Div([
                   'width': 900,
               },
               ),
-], style={'margin': 'auto', 'width': "50%"},
+], style={'margin': 'auto', 'width': "60%"},
     # style = {"display": "flex"}
 )
+
 
 @app.callback(
     Output(component_id='medals-graph', component_property='figure'),
     [Input("url", "pathname")],
     Input(component_id='olympics-dropdown', component_property='value'),
 )
-
 def update_graph(pathname, selected_option):
-    fig=0
-    
+    fig = 0
     if pathname == "/":
         filtered_df = italy_df
-    else:
-        filtered_df = all_countries_df
 
-    if selected_option == 'Age' or selected_option == 'Height' or selected_option == 'Weight':
-        fig = px.scatter(process_data(filtered_df, selected_option), selected_option,
-                         'Total',
-                         color='Total',
+        if selected_option == 'Age' or selected_option == 'Height' or selected_option == 'Weight':
+            fig = px.scatter(process_data(filtered_df, selected_option), selected_option,
+                             'Total',
+                             color='Total',
+                             title=f'Total number of medals / {selected_option}')
+
+        elif selected_option == 'Sex' or selected_option == 'Season':
+            fig = px.pie(process_data(filtered_df, selected_option), selected_option,
+                         'Total', color='Total',
+                         title=f'Total number of medals per /  {selected_option}')
+
+        elif selected_option == 'Medal':
+            fig = px.bar(process_data(filtered_df, selected_option),
+                         selected_option, "Total",
+                         color=selected_option,
+                         title=f'Total number of medals')
+
+        else:
+            fig = px.bar(process_data(filtered_df, selected_option),
+                         selected_option, 'Total',
+                         color=selected_option,
                          title=f'Total number of medals / {selected_option}')
-
-    elif selected_option == 'Sex' or selected_option == 'Season':
-        fig = px.pie(process_data(filtered_df, selected_option), selected_option,
-                     'Total', color='Total',
-                     title=f'Total number of medals per /  {selected_option}')
-
-    elif selected_option == 'Medal':
-        fig = px.bar(process_data(filtered_df, selected_option),
-                     selected_option, "Total",
-                     color=selected_option,
-                     title=f'Total number of medals')
-
+        fig.update_layout(height=800, width=1200)
+        return fig
     else:
-        fig = px.bar(process_data(filtered_df, selected_option),
-                     selected_option, 'Total',
-                     color=selected_option,
-                     title=f'Total number of medals / {selected_option}')
-    return fig
+        df = all_countries_df
+        fig = make_subplots(2, 2)
+        fig.add_trace(
+            go.Scatter(
+                x=process_data(sort_by_sports(selected_option, "Age"), "Age"),
+                y=process_data(sort_by_sports(selected_option, "Total"), "Age")),
+                row=1, col=1
+        )
+        fig.add_trace(
+            go.Bar(
+                x=process_data(sort_by_sports(selected_option, "Height"), "Height"),
+                y=process_data(sort_by_sports(selected_option, "Total"), "Height")),
+                row=1, col=2
+        )
+        fig.add_trace(
+            go.Bar(
+                x=process_data(sort_by_sports(selected_option, "Weight"), "Weight"),
+                y=process_data(sort_by_sports(selected_option, "Total"), "Weight")),
+                row=2, col=1
+        )
+        fig.add_trace(
+            go.Bar(
+                x=process_data(sort_by_sports(selected_option, "Sex"), "Sex"),
+                y=process_data(sort_by_sports(selected_option, "Total"), "Sex")),
+                row=2, col=2
+        )
+        fig.update_layout(height=800, width=1200)
+        return fig
+@app.callback(
+    Output(component_id="olympics-dropdown", component_property="options"),
+    Input(component_id="url", component_property="pathname")
+)
+def update_dropdown(pathname):
+    if pathname == "/":
+        options = [{'label': i, 'value': i} for i in italy_df.columns if i != "Total"]
+    else:
+        options = [{'label': i, 'value': i} for i in ["Basketball", "Athletics", "Tennis", "Football"]]
+    return options
 
 # @ app.callback(
 #     dash.dependencies.Output("page-content", "children"),
@@ -124,7 +164,6 @@ def update_graph(pathname, selected_option):
 #     elif pathname == "/page-2":
 #         fig = update_graph(pathname, all_countries_df)
 #     return {"data": [fig]}
-
 
 if __name__ == '__main__':
     app.run_server(debug=True)

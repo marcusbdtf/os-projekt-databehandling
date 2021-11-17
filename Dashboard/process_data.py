@@ -22,5 +22,11 @@ def process_data(old_df, col):
     filtered_df = old_df.groupby(col).count().reset_index()
     filtered_df = filtered_df.sort_values(by="Total", ascending=False)
     filtered_df = filtered_df[filtered_df[col].notna()]
-
     return filtered_df
+
+def sort_by_sports(sport, sort_by):
+    dataframe = all_countries_df
+    dataframe = dataframe[dataframe["Sport"]==sport]
+    dataframe = dataframe[dataframe["Medal"].notna()]
+    dataframe.groupby(sort_by).count().reset_index()
+    return dataframe
