@@ -22,5 +22,5 @@ def process_data(old_df, col):
     filtered_df = old_df.groupby(col).count().reset_index()
     filtered_df = filtered_df.sort_values(by="Total", ascending=False)
     filtered_df = filtered_df[filtered_df[col].notna()]
-    filtered_df = filtered_df[[col, "Total"]]
+
     return filtered_df
