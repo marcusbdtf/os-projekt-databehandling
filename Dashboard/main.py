@@ -56,7 +56,7 @@ app.layout = html.Div([
     html.H1('Italy Olympics Graphs'),
     dcc.Dropdown(id='olympics-dropdown',
                     options=[{'label': i, 'value': i}
-                             for i in italy_df if i != "Total"],
+                             for i in italy_df.columns if i != "Total"],
                     value='Sport',
                     style={
                         "width": "50%",
@@ -69,16 +69,16 @@ app.layout = html.Div([
                   'width': 900,
               },
               ),
-], style={'margin': 'auto', 'width': "50%"}
+], style={'margin': 'auto', 'width': "50%"},
     # style = {"display": "flex"}
 )
-
 
 @app.callback(
     Output(component_id='medals-graph', component_property='figure'),
     [Input("url", "pathname")],
     Input(component_id='olympics-dropdown', component_property='value'),
 )
+
 def update_graph(pathname, selected_option):
     fig=0
     
@@ -89,42 +89,41 @@ def update_graph(pathname, selected_option):
 
     if selected_option == 'Age' or selected_option == 'Height' or selected_option == 'Weight':
         fig = px.scatter(process_data(filtered_df, selected_option), selected_option,
-                         y='Total',
+                         'Total',
                          color='Total',
                          title=f'Total number of medals / {selected_option}')
 
     elif selected_option == 'Sex' or selected_option == 'Season':
-        fig = px.pie(process_data(filtered_df, selected_option), x=selected_option,
-                     y='Total', color='Total',
+        fig = px.pie(process_data(filtered_df, selected_option), selected_option,
+                     'Total', color='Total',
                      title=f'Total number of medals per /  {selected_option}')
 
     elif selected_option == 'Medal':
         fig = px.bar(process_data(filtered_df, selected_option),
-                     x=selected_option, y="Total",
+                     selected_option, "Total",
                      color=selected_option,
                      title=f'Total number of medals')
 
     else:
         fig = px.bar(process_data(filtered_df, selected_option),
-                     x=selected_option, y='Total',
+                     selected_option, 'Total',
                      color=selected_option,
                      title=f'Total number of medals / {selected_option}')
-
-        return fig
-
-
-@ app.callback(
-    dash.dependencies.Output("page-content", "children"),
-    [Input("url", "pathname")]
-)
-def load_my_page(pathname):
-    fig=0
-    if pathname == "/":
-        fig = update_graph(pathname, italy_df)
-
-    elif pathname == "/page-2":
-        fig = update_graph(pathname, all_countries_df)
     return fig
+
+# @ app.callback(
+#     dash.dependencies.Output("page-content", "children"),
+#     [Input("url", "pathname")]
+# )
+
+# def load_my_page(pathname):
+#     fig=""
+#     if pathname == "/":
+#         fig = update_graph(pathname, italy_df)
+
+#     elif pathname == "/page-2":
+#         fig = update_graph(pathname, all_countries_df)
+#     return {"data": [fig]}
 
 
 if __name__ == '__main__':
