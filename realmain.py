@@ -1,17 +1,11 @@
-from os import path
-import pandas as pd
 from dash import dcc, html
 import dash
-from plotly.offline.offline import iplot
 import plotly_express as px
-from plotly.subplots import make_subplots
-import plotly.graph_objects as go
 import plotly.figure_factory as ff
 from dash.dependencies import Input, Output
 from process_data import get_all_countries
 from process_data import get_italy_data
 from process_data import process_data
-from process_data import process_countries
 from process_data import get_all_sports
 import dash_bootstrap_components as dbc
 
