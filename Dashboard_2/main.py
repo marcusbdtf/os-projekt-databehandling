@@ -134,6 +134,8 @@ def update_graph(pathname, selected_option):
             sportsdata = [football, Basketball, Bobsleigh, Weightlifting]
             grouplabels = ['Football', 'Basketball', 'Bobsleigh', 'Weightlifting']
             """ here we are cleaning the data and adding it to variables and then into lists for easier use ff plotting """
+            # https://stackoverflow.com/questions/63865209/plotly-how-to-show-both-a-normal-distribution-and-a-kernel-density-estimation-i
+            # ^ inspiration for using ff.plot, figured out you could input list
             
             fig = ff.create_distplot(sportsdata, grouplabels, show_hist=False, show_rug=False)
             fig['layout'].update(title='Age distribution per sport')
@@ -168,6 +170,7 @@ def update_graph(pathname, selected_option):
         
             sportsdata = [football, Basketball, Bobsleigh, Weightlifting]
             grouplabels = ['Football', 'Basketball', 'Bobsleigh', 'Weightlifting']
+
             fig = ff.create_distplot(sportsdata, grouplabels, show_hist=False, show_rug=False,)
             fig['layout'].update(title='Weight distribution per sport')
             fig.update_layout(hovermode="x")
@@ -183,14 +186,14 @@ def update_graph(pathname, selected_option):
             fig = px.scatter(filtered_df, "Sport",
                      "Medal",
                      color='NOC', size='Medal', symbol='NOC',
-                     title=f'Total number of medals per sport & country. (Barplot)')
+                     title=f'Total number of medals per sport & country. (Scatterplot)')
 
         else:
             filtered_df = filtered_df.groupby(['NOC', 'Sport'])['Medal'].count().nlargest(50).reset_index()
             fig = px.histogram(filtered_df, selected_option,
                      'Medal',
                      color="NOC",
-                     title=f'Total number of medals per sport & country. (Scatterplot)')
+                     title=f'Total number of medals per sport & country. (Barplot)')
         return fig # returns the figure based on which sidebar tab and then which element in the dropdown menu
 
 if __name__ == '__main__':
