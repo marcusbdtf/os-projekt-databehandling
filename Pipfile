@@ -12,6 +12,7 @@ nbformat = "*"
 dash = "*"
 matplotlib = "*"
 dash-bootstrap-components = "*"
+gunicorn = "*"
 
 [dev-packages]
 ipykernel = "*"
